@@ -7,7 +7,7 @@ $danp_shorturls_class->register_token_setting();
 add_action( 'transition_post_status', 'danp_shorturls_on_publish', 10, 3 );
 function danp_shorturls_on_publish( $new_status, $old_status, $post ) {
   // If statement runs when user publishes a page or post for the first time only
-  if( $new_status === 'publish' && $old_status !== 'publish' && $post->post_type === 'post' && $post->post_type === 'page' ) {
+  if( $new_status === 'publish' && $old_status !== 'publish' && ($post->post_type === 'post' || $post->post_type === 'page') ) {
     // Get page/post ID
     $post_id = get_the_ID($post);
     // Get page/post URL
