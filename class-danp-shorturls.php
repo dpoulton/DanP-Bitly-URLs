@@ -63,6 +63,8 @@ class danp_dot_net_dpbu_shorturls {
         $response['body'] = json_decode($response['body'],1);
         // If Bitly link is returned by API
         if(isset($response['body']['link'])) {
+          // Save to WordPress database
+          $this->save_shortlink($post_id,$response['body']['link']);
           // Return the link -- success!
           return $response['body']['link'];
         }
