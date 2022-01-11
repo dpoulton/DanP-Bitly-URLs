@@ -26,6 +26,7 @@ class danp_dot_net_dpbu_shorturls {
     // Output token input
     echo '<table class="form-table" role="presentation"><tbody><tr><th scope="row"><label for="danpurls-bitly-token">Token</label></th><td><input name="danpurls-bitly-token" type="text" id="danpurls-bitly-token" value="' . $current_value . '"></td></tr></tbody></table>';
     // Output link to guide on how to get token
+    echo '<br><a href="https://dan-p.net/wordpress-plugins/danp-bitly-urls" target="_blank">Getting Started Guide</a> | ';
     echo '<a href="https://support.bitly.com/hc/en-us/articles/230647907-How-do-I-generate-an-OAuth-access-token-for-the-Bitly-API-" target="_blank">How do I get a token?</a><br><br>';
     // Get the last time the API was called
     $last_run = get_option(DANP_DOT_NET_DPBU_OPTION_LAST_RUN,false);

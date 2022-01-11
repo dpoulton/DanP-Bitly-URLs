@@ -1,11 +1,11 @@
 === DanP Bitly URLs ===
 Contributors: danpoulton
-Donate link: https://www.paypal.com/donate/?hosted_button_id=E6ZPJX2HRQ6X8
+Donate link: https://dan-p.net/donate
 Tags: short URLs, Bitly, short links
 Requires at least: 5.0
 Tested up to: 5.8
 Stable tag: 1.0.0
-Requires PHP: 5.6.18
+Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,16 +14,19 @@ Generate Bitly short links for posts and pages every time you first publish. Alr
 == Description ==
 
 This very simple plugin generates a Bitly shortlink and saves it to your WordPress database.
+
 It does this via two different methods:
 
 * Publish a page or post for the first time
 * Click the generate all button
 
+[Getting Started Guide](https://dan-p.net/wordpress-plugins/danp-bitly-urls)
+
 == Frequently Asked Questions ==
 
 = How do I get a Bitly API token? =
 
-You'll need to register for an account with [Bitly](https://bitly.com). Once you've got one, take a look at [this guide from Bitly](https://support.bitly.com/hc/en-us/articles/230647907-How-do-I-generate-an-OAuth-access-token-for-the-Bitly-API-).
+You'll need to register for an account with [Bitly](https://bitly.com). Once you've got one, take a look at [this guide on getting your API token](https://support.bitly.com/hc/en-us/articles/230647907-How-do-I-generate-an-OAuth-access-token-for-the-Bitly-API-).
 
 = Where do I enter my Bitly API token? =
 
