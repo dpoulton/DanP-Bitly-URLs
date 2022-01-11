@@ -2,7 +2,7 @@
 
 /**
   * Plugin Name:        DanP Bitly URLs
-  * Plugin URI:         https://github.com/dpoulton/danp-bitly-urls
+  * Plugin URI:         https://dan-p.net/wordpress-plugins/danp-bitly-urls
   * Description:        Automatically generate short Bitly URLs for your WordPress posts and pages.
   * Version:            1.0.0
   * Author:             Dan Poulton
@@ -22,6 +22,7 @@ if ( ! defined( 'WPINC' ) ) {
 // Define constants
 define('DANP_DOT_NET_DPBU_TOKEN_SETTING', 'danpurls-bitly-token');
 define('DANP_DOT_NET_DPBU_META_KEY', 'danpurls-bitly-url');
+define('DANP_DOT_NET_DPBU_OPTION_LAST_RUN', 'danpurls-bitly-url-last-run');
 
 // Include the plugin class
 require plugin_dir_path( __FILE__ ) . '/class-danp-shorturls.php';

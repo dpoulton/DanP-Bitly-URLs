@@ -22,14 +22,29 @@ class danp_dot_net_dpbu_shorturls {
     $current_value = get_option(DANP_DOT_NET_DPBU_TOKEN_SETTING,'');
     // Sanitize option value
     $current_value = sanitize_option(DANP_DOT_NET_DPBU_TOKEN_SETTING,$current_value);
+    echo '<div style="background: white; padding: 0 15px 7px">';
     // Output token input
     echo '<table class="form-table" role="presentation"><tbody><tr><th scope="row"><label for="danpurls-bitly-token">Token</label></th><td><input name="danpurls-bitly-token" type="text" id="danpurls-bitly-token" value="' . $current_value . '"></td></tr></tbody></table>';
     // Output link to guide on how to get token
     echo '<a href="https://support.bitly.com/hc/en-us/articles/230647907-How-do-I-generate-an-OAuth-access-token-for-the-Bitly-API-" target="_blank">How do I get a token?</a><br><br>';
-    if(!empty($current_value)) {
-      // Update all HTML button, links to the page created by "danp_dot_net_dpbu_update_all_page" on danp-shorturls-admin.php
-      echo '<a class="button" href="' . admin_url() . 'index.php?page=danp-shorturls-update-all">Update all short URLs</a>';
+    // Get the last time the API was called
+    $last_run = get_option(DANP_DOT_NET_DPBU_OPTION_LAST_RUN,false);
+    if($last_run !== false) {
+      $last_run_calc = abs(date('U') - $last_run); // difference between Unix timestamps
+      $last_run_calc = round($last_run_calc / 60); // in minutes
+      // If the API was last called over 2 minutes ago - avoid breaking rate limiting
+      if($last_run_calc > 2) {
+        $last_run = false; // for the IF statement below
+      }
     }
+    if(!empty($current_value) && $last_run === false) {
+      // Update all HTML button, links to the page created by "danp_dot_net_dpbu_update_all_page" on danp-shorturls-admin.php
+      echo '<p><a class="button" href="' . admin_url() . 'index.php?page=danp-shorturls-update-all" style="margin-right: 20px">Update all short URLs</a>(limited to 100 URLs at a time, at least one minute apart, button is hidden when over Bitly\'s API limit)</p>';
+    }
+    else {
+      echo '<p>You can get Bitly URLs for all pages/posts again in two minutes.</p>';
+    }
+    echo '</div>';
   }
   // Generate new/ retrieve existing short URL from Bitly -- URL on success, false on failure
   function generate_shorturl($post_id,$url) {
@@ -100,7 +115,7 @@ class danp_dot_net_dpbu_shorturls {
     // Fetch all pages and posts
     $the_query = new WP_Query(array(
       'post_type' => array('post', 'page'),
-      'posts_per_page' => -1
+      'posts_per_page' => 99 // limited to 100 per minute
     ));
     // Initiate a counter
     $updated = 0;
@@ -128,6 +143,8 @@ class danp_dot_net_dpbu_shorturls {
     }
     // Restore original Post data
     wp_reset_postdata();
+    // Store last ran option
+    update_option(DANP_DOT_NET_DPBU_OPTION_LAST_RUN,date('U'));
     // Return number of new short URLs generated, 0 if none
     return $updated;
   }
