@@ -6,7 +6,7 @@ class danp_dot_net_dpbu_shorturls {
   function register_token_setting() {
     add_action('admin_init', function() {
       // Register the setting so WordPress will process it on saving
-      register_setting('reading', DANP_DOT_NET_DPBU_TOKEN_SETTING, array('type' => 'string', 'description' => 'Your Bitly API Token'));
+      register_setting('reading', DANP_DOT_NET_DPBU_TOKEN_SETTING, array('type' => 'string', 'description' => 'Your Bitly API Token', 'sanitize_callback' => array($this,'check_token')));
       // Add a new section to Settings > Reading, defined in "register_token_setting_callback" method below
       add_settings_section(
         DANP_DOT_NET_DPBU_TOKEN_SETTING,
@@ -16,10 +16,41 @@ class danp_dot_net_dpbu_shorturls {
       );
     });
   }
+  // Check token
+  function check_token($token) {
+    // Create JSON payload
+    $payload = array('long_url' => 'https://dan-p.net');
+    // Convert PHP array to JSON
+    $json_payload = json_encode($payload);
+    // Set HTTP headers
+    $headers = array (
+      'Host' => 'api-ssl.bitly.com',
+      'Authorization' => 'Bearer ' . $token,
+      'Content-Type' => 'application/json'
+    );
+    // Use WordPress HTTP API to retrieve JSON response from Bitly
+    $response = wp_remote_post( 'https://api-ssl.bitly.com/v4/shorten' , array(
+        'method'      => 'POST',
+        'headers'     => $headers,
+        'body'        => $json_payload
+        )
+    );
+    // Successfully retrieved API
+    if($response['response']['code'] === 200 && isset($response['body'])) {
+      // Convert JSON response to PHP array
+      $response['body'] = json_decode($response['body'],1);
+      // If Bitly link is returned by API
+      if(isset($response['body']['link'])) {
+        // Return valid token, saves as a setting
+        return $token;
+      }
+    }
+    return 'Token failed';
+  }
   // Add the HTML code to Settings > Reading, adds token input box and generate all button
   function register_token_setting_callback($args) {
     // Get current token (if any)
-    $current_value = get_option(DANP_DOT_NET_DPBU_TOKEN_SETTING,'');
+    $current_value = get_option(DANP_DOT_NET_DPBU_TOKEN_SETTING,'Enter token');
     // Sanitize option value
     $current_value = sanitize_option(DANP_DOT_NET_DPBU_TOKEN_SETTING,$current_value);
     echo '<div style="background: white; padding: 0 15px 7px">';
@@ -28,22 +59,29 @@ class danp_dot_net_dpbu_shorturls {
     // Output link to guide on how to get token
     echo '<br><a href="https://dan-p.net/wordpress-plugins/danp-bitly-urls" target="_blank">Getting Started Guide</a> | ';
     echo '<a href="https://support.bitly.com/hc/en-us/articles/230647907-How-do-I-generate-an-OAuth-access-token-for-the-Bitly-API-" target="_blank">How do I get a token?</a><br><br>';
-    // Get the last time the API was called
-    $last_run = get_option(DANP_DOT_NET_DPBU_OPTION_LAST_RUN,false);
-    if($last_run !== false) {
-      $last_run_calc = abs(date('U') - $last_run); // difference between Unix timestamps
-      $last_run_calc = round($last_run_calc / 60); // in minutes
-      // If the API was last called over 2 minutes ago - avoid breaking rate limiting
-      if($last_run_calc > 2) {
-        $last_run = false; // for the IF statement below
-      }
-    }
-    if(!empty($current_value) && $last_run === false) {
-      // Update all HTML button, links to the page created by "danp_dot_net_dpbu_update_all_page" on danp-shorturls-admin.php
-      echo '<p><a class="button" href="' . admin_url() . 'index.php?page=danp-shorturls-update-all" style="margin-right: 20px">Update all short URLs</a>(limited to 100 URLs at a time, at least one minute apart, button is hidden when over Bitly\'s API limit)</p>';
+    // Tokens can't contain spaces, blank token default value "Enter token", bad token default value "Token failed", (both contain a space)
+    if(substr_count($current_value,' ') > 0) {
+      echo '<p>Enter a valid token for the \'Update all URLs\' button to appear here.</p>';
     }
     else {
-      echo '<p>You can get Bitly URLs for all pages/posts again in two minutes.</p>';
+      // Get the last time the API was called
+      $last_run = get_option(DANP_DOT_NET_DPBU_OPTION_LAST_RUN,false);
+      if($last_run !== false) {
+        $last_run_calc = abs(date('U') - $last_run); // difference between Unix timestamps
+        $last_run_calc = round($last_run_calc / 60); // in minutes
+        // If the API was last called over 2 minutes ago - avoid breaking rate limiting
+        if($last_run_calc > 2) {
+          $last_run = false; // for the IF statement below
+        }
+      }
+      if(!empty($current_value) && $last_run === false) {
+        // Update all HTML button, links to the page created by "danp_dot_net_dpbu_update_all_page" on danp-shorturls-admin.php
+        echo '<p><a class="button" href="' . admin_url() . 'index.php?page=danp-shorturls-update-all" style="margin-right: 20px">Update all short URLs</a>(limited to 100 URLs at a time, at least one minute apart, button is hidden when over Bitly\'s API limit)</p>';
+      }
+      else {
+        // Rate limiting
+        echo '<p>You can get Bitly URLs for all pages/posts again in two minutes.</p>';
+      }
     }
     echo '</div>';
   }

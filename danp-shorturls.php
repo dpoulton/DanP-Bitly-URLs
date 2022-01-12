@@ -4,7 +4,7 @@
   * Plugin Name:        DanP Bitly URLs
   * Plugin URI:         https://dan-p.net/wordpress-plugins/danp-bitly-urls
   * Description:        Automatically generate short Bitly URLs for your WordPress posts and pages.
-  * Version:            1.0.0
+  * Version:            1.1.0
   * Author:             Dan Poulton
   * Author URI:         https://dan-p.net
   * License:            GPL v2 or later
@@ -58,5 +58,28 @@ function danp_dot_net_dpbu_shortlink_filter($status, $id, $context, $allow_slugs
 if ( is_admin() ) {
   require_once plugin_dir_path( __FILE__ ) . '/danp-shorturls-admin.php';
 }
+
+// Shortcode
+add_shortcode( 'danp-bitly-url', 'danp_dot_net_dpbu_shorturls_shortcode' );
+function danp_dot_net_dpbu_shorturls_shortcode( $atts ) {
+	// If the ID is set, use that, if not, use get_the_ID()
+  $atts = shortcode_atts( array(
+    'id' => get_the_ID()
+  ), $atts, 'danp-bitly-url' );
+	// Get the pageviews
+	$views = get_post_meta( $atts['id'], DANP_DOT_NET_DPBU_META_KEY, true );
+	// Cast variable to integer
+	$views = intval($views);
+	// If views are greater than zero, return it
+	if($views > 0) {
+		// Format the number (e.g., commas for thousands)
+		$views = format_number($views);
+		return $views;
+	}
+	// Fallback return: "0"
+  return 0;
+}
+
+
 
 ?>

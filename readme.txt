@@ -4,7 +4,7 @@ Donate link: https://dan-p.net/donate
 Tags: short URLs, Bitly, short links
 Requires at least: 5.0
 Tested up to: 5.8
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -49,7 +49,15 @@ Either:
 = 1.0 =
 * This is the first version!
 
+= 1.1 =
+* API token is now checked for validity on saving that option
+* Shortcode to output Bitly shortened URL introduced
+
 == Upgrade Notice ==
 
 = 1.0 =
 * This is the first version!
+
+= 1.1 =
+* API token is now checked for validity on saving that option
+* Shortcode to output Bitly shortened URL introduced
